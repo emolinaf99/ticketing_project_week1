@@ -1,0 +1,294 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="crudservice-c4-l4" name="CrudService — C4 Nivel 4">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- TÍTULO -->
+        <!-- ══════════════════════════════════════════ -->
+        <mxCell id="2" value="CrudService — C4 Nivel 4 : Diagrama de Componentes + Patrones GoF" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="200" y="18" width="1000" height="42" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- ZONA 1 — API Layer -->
+        <!-- ══════════════════════════════════════════ -->
+        <mxCell id="3" value="① API Layer  [CrudService.Api — ASP.NET Core]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#4a90d9;fontStyle=1;fontSize=11;verticalAlign=top;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="80" y="80" width="1280" height="108" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="EventsController&#xa;─────────────────&#xa;GET/POST/PUT/DELETE /api/events&#xa;→ llama EventService (Service layer)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4a90d9;fontColor=#ffffff;strokeColor=#2c5f8a;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="180" y="107" width="280" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="TicketsController&#xa;─────────────────&#xa;GET/POST/PATCH /api/tickets&#xa;→ llama TicketService (Service layer)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4a90d9;fontColor=#ffffff;strokeColor=#2c5f8a;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="950" y="107" width="280" height="68" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- ZONA 2 — Application: Service Layer [FACADE] -->
+        <!-- ══════════════════════════════════════════ -->
+        <mxCell id="6" value="② Application — Service Layer  [CrudService.Application / Services]  ← capa de acceso del controller" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#27ae60;fontStyle=1;fontSize=11;verticalAlign=top;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="80" y="208" width="1280" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="IEventService / EventService&#xa;─────────────────&#xa;GetAllEvents, CreateEvent, UpdateEvent, DeleteEvent&#xa;Coordina IEventRepository + ITicketRepository&#xa;[GoF: FACADE — de DESIGN_PATTERNS.md]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#27ae60;fontColor=#ffffff;strokeColor=#1a7a42;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="160" y="232" width="380" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="ITicketService / TicketService&#xa;─────────────────&#xa;CreateTickets, UpdateStatus, ReleaseTicket&#xa;Coordina ITicketRepository + ITicketHistoryRepo&#xa;[GoF: FACADE — de DESIGN_PATTERNS.md]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#27ae60;fontColor=#ffffff;strokeColor=#1a7a42;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="820" y="232" width="400" height="62" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- ZONA 3 — Application: CQRS Use Cases [COMMAND + FACADE] -->
+        <!-- ══════════════════════════════════════════ -->
+        <mxCell id="9" value="③ Application — CQRS Use Cases  [CrudService.Application / UseCases]  ← capa de orquestación detallada (Command pattern + CQRS)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e8f4e8;strokeColor=#27ae60;fontStyle=1;fontSize=11;verticalAlign=top;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="80" y="323" width="1280" height="268" as="geometry" />
+        </mxCell>
+
+        <!-- Events CQRS sub-zone -->
+        <mxCell id="10" value="Events — Commands  [GoF: COMMAND + FACADE]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#388e3c;fontStyle=1;fontSize=10;verticalAlign=top;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="100" y="346" width="580" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="CreateEventCommandHandler&#xa;Crea evento → IEventRepository.AddAsync()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#388e3c;fontColor=#ffffff;strokeColor=#1b5e20;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="115" y="370" width="265" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="UpdateEventCommandHandler&#xa;Actualiza nombre/fecha → IEventRepository.UpdateAsync()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#388e3c;fontColor=#ffffff;strokeColor=#1b5e20;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="395" y="370" width="270" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="DeleteEventCommandHandler&#xa;Elimina evento → IEventRepository.DeleteAsync()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#388e3c;fontColor=#ffffff;strokeColor=#1b5e20;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="115" y="418" width="265" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- Events CQRS Queries sub-zone -->
+        <mxCell id="14" value="Events — Queries  [CQRS — solo lectura, sin side-effects]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#388e3c;fontStyle=1;fontSize=10;verticalAlign=top;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="100" y="473" width="580" height="108" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="GetAllEventsQueryHandler&#xa;Retorna lista paginada de eventos" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#388e3c;fontColor=#ffffff;strokeColor=#1b5e20;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="115" y="495" width="260" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="GetEventByIdQueryHandler&#xa;Retorna un evento por ID" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#388e3c;fontColor=#ffffff;strokeColor=#1b5e20;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="395" y="495" width="270" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="Nota: Cada handler recibe un Command/Query object&#xa;(GoF: Command) y retorna DTO" style="text;html=1;fillColor=none;strokeColor=none;fontSize=9;align=left;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="115" y="538" width="550" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- Tickets CQRS Commands sub-zone -->
+        <mxCell id="18" value="Tickets — Commands  [GoF: COMMAND + FACADE]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#388e3c;fontStyle=1;fontSize=10;verticalAlign=top;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="700" y="346" width="638" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="CreateTicketsCommandHandler&#xa;Crea N tickets para un evento" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#388e3c;fontColor=#ffffff;strokeColor=#1b5e20;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="715" y="370" width="280" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="20" value="UpdateTicketStatusCommandHandler&#xa;Cambia estado + registra TicketHistory" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#388e3c;fontColor=#ffffff;strokeColor=#1b5e20;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="370" width="310" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="21" value="ReleaseTicketCommandHandler&#xa;Libera ticket reservado → estado Released" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#388e3c;fontColor=#ffffff;strokeColor=#1b5e20;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="715" y="418" width="280" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- Tickets CQRS Queries sub-zone -->
+        <mxCell id="22" value="Tickets — Queries  [CQRS — solo lectura]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#388e3c;fontStyle=1;fontSize=10;verticalAlign=top;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="700" y="473" width="638" height="108" as="geometry" />
+        </mxCell>
+        <mxCell id="23" value="GetTicketByIdQueryHandler" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#388e3c;fontColor=#ffffff;strokeColor=#1b5e20;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="715" y="495" width="195" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="24" value="GetTicketsByEventQueryHandler" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#388e3c;fontColor=#ffffff;strokeColor=#1b5e20;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="925" y="495" width="195" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="25" value="GetExpiredTicketsQueryHandler" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#388e3c;fontColor=#ffffff;strokeColor=#1b5e20;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="1128" y="495" width="195" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="26" value="Nota: Cada Query object lleva parámetros de filtro&#xa;(GoF: Command aplicado a lecturas)" style="text;html=1;fillColor=none;strokeColor=none;fontSize=9;align=left;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="715" y="533" width="600" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- ZONA 4 — Domain Entities -->
+        <!-- ══════════════════════════════════════════ -->
+        <mxCell id="27" value="④ Domain — Entidades  [CrudService.Domain / Entities]&#xa;⚠ Sin Factory Method ni State pattern (entidades POCO con propiedades públicas)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d6790e;fontStyle=1;fontSize=11;verticalAlign=top;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="80" y="611" width="1280" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="28" value="Event&#xa;─────────────────&#xa;Id, Name, StartsAt&#xa;ICollection&lt;Ticket&gt; Tickets" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d6790e;fontColor=#ffffff;strokeColor=#a0540a;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="140" y="635" width="210" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="29" value="Ticket&#xa;─────────────────&#xa;Id, EventId, Status (enum)&#xa;ReservedBy, Version (optimistic lock)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d6790e;fontColor=#ffffff;strokeColor=#a0540a;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="380" y="635" width="260" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="30" value="TicketHistory&#xa;─────────────────&#xa;TicketId, OldStatus, NewStatus&#xa;Reason, ChangedAt" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d6790e;fontColor=#ffffff;strokeColor=#a0540a;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="668" y="635" width="240" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="31" value="Payment&#xa;─────────────────&#xa;Id, TicketId, Amount&#xa;PaidAt" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d6790e;fontColor=#ffffff;strokeColor=#a0540a;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="936" y="635" width="200" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="32" value="TicketStatus (enum)&#xa;─────────────────&#xa;Available, Reserved&#xa;Paid, Released, Cancelled&#xa;⚠ enum — no es State GoF" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d6790e;fontColor=#ffffff;strokeColor=#a0540a;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="1162" y="635" width="165" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- ZONA 5 — Domain Interfaces (Output Ports) -->
+        <!-- ══════════════════════════════════════════ -->
+        <mxCell id="33" value="⑤ Domain — Interfaces / Output Ports  [CrudService.Domain / Interfaces]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#c97d00;fontStyle=1;fontSize=11;verticalAlign=top;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="80" y="731" width="1280" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="34" value="«interface»&#xa;IEventRepository" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5a623;fontColor=#000000;strokeColor=#c97d00;fontStyle=2;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="148" y="754" width="195" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="35" value="«interface»&#xa;ITicketRepository" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5a623;fontColor=#000000;strokeColor=#c97d00;fontStyle=2;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="490" y="754" width="195" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="36" value="«interface»&#xa;ITicketHistoryRepository" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5a623;fontColor=#000000;strokeColor=#c97d00;fontStyle=2;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="840" y="754" width="215" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="37" value="«interface»&#xa;ITicketStatusNotifier&#xa;[GoF: OBSERVER — contrato del hub]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5a623;fontColor=#000000;strokeColor=#c97d00;fontStyle=2;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="754" width="215" height="48" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- ZONA 6 — Infrastructure [ADAPTER] -->
+        <!-- ══════════════════════════════════════════ -->
+        <mxCell id="38" value="⑥ Infrastructure — Adaptadores  [CrudService.Infrastructure]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#8e44ad;fontStyle=1;fontSize=11;verticalAlign=top;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="80" y="833" width="1280" height="142" as="geometry" />
+        </mxCell>
+        <mxCell id="39" value="EventRepository  [EF Core]&#xa;─────────────────&#xa;GetAll, GetById, Add, Update, Delete&#xa;TicketingDbContext&#xa;[GoF: ADAPTER — de DESIGN_PATTERNS.md]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#8e44ad;fontColor=#ffffff;strokeColor=#5b2c6f;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="100" y="860" width="255" height="98" as="geometry" />
+        </mxCell>
+        <mxCell id="40" value="TicketRepository  [EF Core]&#xa;─────────────────&#xa;GetById, GetByEvent, GetExpired&#xa;Update con control de concurrencia (Version)&#xa;[GoF: ADAPTER — de DESIGN_PATTERNS.md]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#8e44ad;fontColor=#ffffff;strokeColor=#5b2c6f;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="375" y="860" width="268" height="98" as="geometry" />
+        </mxCell>
+        <mxCell id="41" value="TicketHistoryRepository  [EF Core]&#xa;─────────────────&#xa;AddAsync — registra cada cambio&#xa;de estado como auditoría&#xa;[GoF: ADAPTER — de DESIGN_PATTERNS.md]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#8e44ad;fontColor=#ffffff;strokeColor=#5b2c6f;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="663" y="860" width="268" height="98" as="geometry" />
+        </mxCell>
+        <mxCell id="42" value="TicketStatusConsumer&#xa;[BackgroundService]&#xa;─────────────────&#xa;Consume q.ticket.status.changed&#xa;→ ITicketStatusNotifier.Notify()&#xa;[GoF: ADAPTER — RabbitMQ a dominio]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#8e44ad;fontColor=#ffffff;strokeColor=#5b2c6f;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="950" y="860" width="250" height="98" as="geometry" />
+        </mxCell>
+        <mxCell id="43" value="TicketStatusHub&#xa;[SSE / SignalR-like]&#xa;─────────────────&#xa;Implementa ITicketStatusNotifier&#xa;→ notifica clientes SSE&#xa;[GoF: OBSERVER — sujeto concreto]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#8e44ad;fontColor=#ffffff;strokeColor=#5b2c6f;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="1215" y="860" width="125" height="98" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- DEPENDENCIAS EXTERNAS -->
+        <!-- ══════════════════════════════════════════ -->
+        <mxCell id="44" value="PostgreSQL" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="430" y="1000" width="180" height="68" as="geometry" />
+        </mxCell>
+        <mxCell id="45" value="RabbitMQ&#xa;q.ticket.status.changed" style="shape=mxgraph.cisco.servers.standard_server;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="960" y="1002" width="50" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="45b" value="RabbitMQ&#xa;(q.ticket.status.changed)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="950" y="1000" width="240" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="46" value="Frontend SSE Client&#xa;(EventSource API)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1215" y="1000" width="135" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- LEYENDA DE PATRONES -->
+        <!-- ══════════════════════════════════════════ -->
+        <mxCell id="50" value="Patrones — CrudService" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666;fontStyle=1;fontSize=11;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1420" y="80" width="218" height="540" as="geometry" />
+        </mxCell>
+        <mxCell id="51" value="DE DESIGN_PATTERNS.md" style="text;html=1;strokeColor=none;fillColor=none;fontStyle=1;fontSize=9;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1426" y="105" width="205" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="52" value="[ADAPTER]&#xa;EventRepository, TicketRepository,&#xa;TicketHistoryRepository,&#xa;TicketStatusConsumer." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#8e44ad;fontColor=#ffffff;strokeColor=#5b2c6f;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="1428" y="128" width="202" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="53" value="[FACADE]&#xa;EventService, TicketService.&#xa;Simplifican repos + mapeo&#xa;al controller." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#27ae60;fontColor=#ffffff;strokeColor=#1a7a42;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="1428" y="200" width="202" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="54" value="ADICIONALES EN CRUDSERVICE" style="text;html=1;strokeColor=none;fillColor=none;fontStyle=1;fontSize=9;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1426" y="265" width="205" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="55" value="[COMMAND (GoF)]&#xa;Command/Query objects&#xa;encapsulan intención de la solicitud&#xa;(CreateEventCommand, etc.)." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#388e3c;fontColor=#ffffff;strokeColor=#1b5e20;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="1428" y="288" width="202" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="56" value="[CQRS — arquitectural]&#xa;Commands (escritura) y Queries&#xa;(lectura) en handlers separados.&#xa;No es estrictamente GoF." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#388e3c;fontColor=#1b5e20;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="1428" y="362" width="202" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="57" value="[OBSERVER (GoF)]&#xa;TicketStatusConsumer (sujeto)&#xa;→ ITicketStatusNotifier&#xa;→ TicketStatusHub → SSE clients." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5a623;fontColor=#000000;strokeColor=#c97d00;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="1428" y="436" width="202" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="58" value="NO PRESENTES en CrudService:&#xa;Factory Method, State, Strategy" style="text;html=1;strokeColor=#cc0000;fillColor=#ffe0e0;fontSize=9;align=left;rounded=1;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="1428" y="510" width="202" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="59" value="→  llama / usa&#xa;--→  implementa / extiende" style="text;html=1;strokeColor=none;fillColor=none;fontSize=9;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1428" y="562" width="202" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- EDGES — API → Service Layer -->
+        <!-- ══════════════════════════════════════════ -->
+        <mxCell id="70" value="llama" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;" edge="1" source="4" target="7" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="71" value="llama" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;" edge="1" source="5" target="8" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Service Layer → Domain Interfaces -->
+        <mxCell id="72" value="usa" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="7" target="34" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="73" value="usa" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="7" target="35" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="74" value="usa" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;" edge="1" source="8" target="35" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="75" value="usa" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;" edge="1" source="8" target="36" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- CQRS Handlers → Domain Interfaces -->
+        <mxCell id="76" value="usa" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;" edge="1" source="11" target="34" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="77" value="usa" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;" edge="1" source="19" target="35" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="78" value="usa" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;" edge="1" source="20" target="36" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Infrastructure implementa Domain Interfaces -->
+        <mxCell id="79" value="implementa" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;dashPattern=8 4;fontSize=9;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" source="39" target="34" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="80" value="implementa" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;dashPattern=8 4;fontSize=9;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" source="40" target="35" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="81" value="implementa" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;dashPattern=8 4;fontSize=9;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" source="41" target="36" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="82" value="implementa" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;dashPattern=8 4;fontSize=9;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" source="43" target="37" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- TicketStatusConsumer → ITicketStatusNotifier (Observer) -->
+        <mxCell id="83" value="notifica (Observer)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;" edge="1" source="42" target="37" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Infrastructure → External -->
+        <mxCell id="84" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" source="39" target="44" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="85" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" source="40" target="44" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="86" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" source="41" target="44" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="87" value="consume" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;" edge="1" source="42" target="45b" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="88" value="SSE push" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;" edge="1" source="43" target="46" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

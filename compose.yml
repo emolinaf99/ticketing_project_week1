@@ -158,6 +158,48 @@ services:
       - ticketing_network
     restart: unless-stopped
 
+  # Auth DB - Base de datos exclusiva para el servicio de autenticación
+  auth-db:
+    image: postgres:15-alpine
+    container_name: authservice_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: authdb
+    volumes:
+      - auth_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d authdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ticketing_network
+
+  # Auth Service - Maneja autenticación y registro de usuarios
+  auth-service:
+    build:
+      context: ./authService
+      dockerfile: Dockerfile
+    container_name: authservice_api
+    ports:
+      - "8003:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Host=auth-db;Port=5432;Database=authdb;Username=postgres;Password=postgres"
+      JwtSettings__Secret: "super-secret-key-change-in-production-32chars!"
+      JwtSettings__Issuer: "AuthService"
+      JwtSettings__Audience: "TicketingPlatform"
+      JwtSettings__ExpirationMinutes: "60"
+      LockoutSettings__MaxFailedAttempts: "3"
+      LockoutSettings__LockoutDurationMinutes: "15"
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    networks:
+      - ticketing_network
+    restart: unless-stopped
+
   # Reservation Service - Consumer que procesa reservas de tickets
   reservation-service:
     build:
@@ -184,6 +226,7 @@ services:
 volumes:
   postgres_data:
   rabbitmq_data:
+  auth_postgres_data:
 
 networks:
   ticketing_network:
