@@ -67,6 +67,11 @@ public class Ticket
     /// <summary>
     /// Versión del ticket (para control de concurrencia)
     /// </summary>
+    /// <summary>
+    /// Precio del ticket en centavos (ej. 5000 = $50.00 USD)
+    /// </summary>
+    public int PriceCents { get; set; } = 0;
+
     public int Version { get; set; } = 0;
 
     /// <summary>

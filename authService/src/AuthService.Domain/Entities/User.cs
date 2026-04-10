@@ -14,6 +14,7 @@ public sealed class User
     public string LastName { get; private set; } = default!;
     public string Email { get; private set; } = default!;
     public string PasswordHash { get; private set; } = default!;
+    public UserRole Role { get; private set; }
     public DateTime? LockedUntil { get; private set; }
     public int FailedLoginAttempts { get; private set; }
     public DateTime CreatedAt { get; private set; }
@@ -22,7 +23,7 @@ public sealed class User
     private User() { }
 
     // Factory Method — validates domain invariants
-    public static User Create(string firstName, string lastName, string email, string passwordHash)
+    public static User Create(string firstName, string lastName, string email, string passwordHash, UserRole role = UserRole.Buyer)
     {
         if (string.IsNullOrWhiteSpace(firstName)) throw new ArgumentException("El nombre es obligatorio.", nameof(firstName));
         if (string.IsNullOrWhiteSpace(lastName)) throw new ArgumentException("El apellido es obligatorio.", nameof(lastName));
@@ -36,6 +37,7 @@ public sealed class User
             LastName = lastName.Trim(),
             Email = email.Trim().ToLowerInvariant(),
             PasswordHash = passwordHash,
+            Role = role,
             FailedLoginAttempts = 0,
             CreatedAt = DateTime.UtcNow
         };

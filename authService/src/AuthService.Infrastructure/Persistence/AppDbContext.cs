@@ -25,6 +25,11 @@ public sealed class AppDbContext : DbContext
             entity.Property(u => u.Email).HasColumnName("email").IsRequired().HasMaxLength(255);
             entity.HasIndex(u => u.Email).IsUnique();
             entity.Property(u => u.PasswordHash).HasColumnName("password_hash").IsRequired();
+            entity.Property(u => u.Role).HasColumnName("role")
+                  .HasConversion(r => r.ToString().ToLowerInvariant(),
+                                 s => Enum.Parse<UserRole>(s, true))
+                  .HasDefaultValue(UserRole.Buyer)
+                  .IsRequired();
             entity.Property(u => u.LockedUntil).HasColumnName("locked_until");
             entity.Property(u => u.FailedLoginAttempts).HasColumnName("failed_login_attempts").HasDefaultValue(0);
             entity.Property(u => u.CreatedAt).HasColumnName("created_at");

@@ -34,8 +34,8 @@ public class PaymentsController : ControllerBase
         if (request.EventId <= 0)
             return BadRequest(new { message = "EventId debe ser mayor a 0" });
 
-        if (request.AmountCents <= 0)
-            return BadRequest(new { message = "AmountCents debe ser mayor a 0" });
+        if (request.AmountCents < 0)
+            return BadRequest(new { message = "AmountCents no puede ser negativo" });
 
         if (string.IsNullOrWhiteSpace(request.PaymentBy))
             return BadRequest(new { message = "PaymentBy es requerido" });

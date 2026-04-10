@@ -114,7 +114,7 @@ public class TicketsController : ControllerBase
             if (request.Quantity <= 0 || request.Quantity > 1000)
                 return BadRequest("Quantity debe estar entre 1 y 1000");
 
-            var tickets = await _ticketService.CreateTicketsAsync(request.EventId, request.Quantity);
+            var tickets = await _ticketService.CreateTicketsAsync(request.EventId, request.Quantity, request.PriceCents);
             _logger.LogInformation("Creados {Quantity} tickets para evento {EventId}", request.Quantity, request.EventId);
             return CreatedAtAction(nameof(GetTicketsByEvent), new { eventId = request.EventId }, tickets);
         }
@@ -220,4 +220,5 @@ public class CreateTicketsRequest
 {
     public long EventId { get; set; }
     public int Quantity { get; set; }
+    public int PriceCents { get; set; } = 0;
 }

@@ -32,7 +32,7 @@ public sealed class RegisterUserUseCase : IRegisterUserUseCase
         // RN3: hash before persistence — never store plain text
         string hash = _passwordHashingService.Hash(request.Password);
 
-        var user = User.Create(request.FirstName, request.LastName, normalizedEmail, hash);
+        var user = User.Create(request.FirstName, request.LastName, normalizedEmail, hash, request.Role);
 
         await _userRepository.SaveAsync(user);
 

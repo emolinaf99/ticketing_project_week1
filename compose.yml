@@ -2,7 +2,7 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: ticketing_db
+    container_name: ticketify_db
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -18,12 +18,12 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - ticketing_network
+      - ticketify_network
 
   # RabbitMQ Message Broker
   rabbitmq:
     image: rabbitmq:3.12-management-alpine
-    container_name: ticketing_broker
+    container_name: ticketify_broker
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
@@ -39,12 +39,12 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - ticketing_network
+      - ticketify_network
 
   # RabbitMQ Setup - configura exchanges, colas y bindings automáticamente
   rabbitmq-setup:
     image: curlimages/curl:latest
-    container_name: ticketing_setup
+    container_name: ticketify_setup
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -65,14 +65,14 @@ services:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
     networks:
-      - ticketing_network
+      - ticketify_network
 
   # Producer Service - Expone API para publicar eventos
   producer:
     build:
       context: ./producer
       dockerfile: Dockerfile
-    container_name: ticketing_producer
+    container_name: ticketify_producer
     depends_on:
       rabbitmq-setup:
         condition: service_completed_successfully
@@ -95,7 +95,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - ticketing_network
+      - ticketify_network
     restart: unless-stopped
 
   # Payment Service Worker - Consume eventos de pago (approved/rejected) desde RabbitMQ
@@ -103,7 +103,7 @@ services:
     build:
       context: ./paymentService
       dockerfile: Dockerfile
-    container_name: ticketing_payment
+    container_name: ticketify_payment
     depends_on:
       postgres:
         condition: service_healthy
@@ -125,7 +125,7 @@ services:
       - RabbitMQ__RequestedQueueName=q.ticket.payment.requested
       - RabbitMQ__ExchangeName=tickets
     networks:
-      - ticketing_network
+      - ticketify_network
     restart: unless-stopped
 
   # CRUD Service - Gestiona datos de eventos, tickets y pagos
@@ -133,7 +133,7 @@ services:
     build:
       context: ./crud_service
       dockerfile: Dockerfile
-    container_name: ticketing_crud
+    container_name: ticketify_crud
     ports:
       - "${CRUD_PORT}:8080"
     environment:
@@ -155,7 +155,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - ticketing_network
+      - ticketify_network
     restart: unless-stopped
 
   # Auth DB - Base de datos exclusiva para el servicio de autenticación
@@ -174,7 +174,39 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - ticketing_network
+      - ticketify_network
+
+  # Fair Queue Service - Cola justa en tiempo real para acceso a tickets
+  fair-queue-service:
+    build:
+      context: ./FairQueueService
+      dockerfile: Dockerfile
+    container_name: ticketify_fair_queue
+    ports:
+      - "8004:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORT=8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Port=${RABBITMQ_AMQP_PORT}
+      - RabbitMQ__Username=${RABBITMQ_DEFAULT_USER}
+      - RabbitMQ__Password=${RABBITMQ_DEFAULT_PASS}
+      - RabbitMQ__ExchangeName=tickets
+      - RabbitMQ__TicketReservedRoutingKey=ticket.reserved
+      - RabbitMQ__ReleasedQueueName=q.ticket.released.queue
+      - JwtSettings__Secret=super-secret-key-change-in-production-32chars!
+      - JwtSettings__Issuer=AuthService
+      - JwtSettings__Audience=TicketifyPlatform
+      - QueueSettings__TurnDurationSeconds=60
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq-setup:
+        condition: service_completed_successfully
+    networks:
+      - ticketify_network
+    restart: unless-stopped
 
   # Auth Service - Maneja autenticación y registro de usuarios
   auth-service:
@@ -189,7 +221,7 @@ services:
       ConnectionStrings__DefaultConnection: "Host=auth-db;Port=5432;Database=authdb;Username=postgres;Password=postgres"
       JwtSettings__Secret: "super-secret-key-change-in-production-32chars!"
       JwtSettings__Issuer: "AuthService"
-      JwtSettings__Audience: "TicketingPlatform"
+      JwtSettings__Audience: "TicketifyPlatform"
       JwtSettings__ExpirationMinutes: "60"
       LockoutSettings__MaxFailedAttempts: "3"
       LockoutSettings__LockoutDurationMinutes: "15"
@@ -197,7 +229,7 @@ services:
       auth-db:
         condition: service_healthy
     networks:
-      - ticketing_network
+      - ticketify_network
     restart: unless-stopped
 
   # Reservation Service - Consumer que procesa reservas de tickets
@@ -205,7 +237,7 @@ services:
     build:
       context: ./ReservationService
       dockerfile: Dockerfile
-    container_name: ticketing_reservation
+    container_name: ticketify_reservation
     depends_on:
       postgres:
         condition: service_healthy
@@ -220,7 +252,7 @@ services:
       - RabbitMQ__Password=${RABBITMQ_DEFAULT_PASS}
       - RabbitMQ__QueueName=q.ticket.reserved
     networks:
-      - ticketing_network
+      - ticketify_network
     restart: unless-stopped
 
 volumes:
@@ -229,5 +261,5 @@ volumes:
   auth_postgres_data:
 
 networks:
-  ticketing_network:
+  ticketify_network:
     driver: bridge

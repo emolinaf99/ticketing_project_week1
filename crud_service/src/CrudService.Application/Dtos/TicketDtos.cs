@@ -15,6 +15,7 @@ public class TicketDto
     public DateTime? PaidAt { get; set; }
     public string? OrderId { get; set; }
     public string? ReservedBy { get; set; }
+    public int PriceCents { get; set; }
     public int Version { get; set; }
 }
 
@@ -22,6 +23,7 @@ public class CreateTicketRequest
 {
     public long EventId { get; set; }
     public int Quantity { get; set; } = 1;
+    public int PriceCents { get; set; } = 0;
 }
 
 public class UpdateTicketStatusRequest

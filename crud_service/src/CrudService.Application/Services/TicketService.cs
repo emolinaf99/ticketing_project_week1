@@ -12,7 +12,7 @@ public interface ITicketService
 {
     Task<IEnumerable<TicketDto>> GetTicketsByEventAsync(long eventId);
     Task<TicketDto?> GetTicketByIdAsync(long id);
-    Task<IEnumerable<TicketDto>> CreateTicketsAsync(long eventId, int quantity);
+    Task<IEnumerable<TicketDto>> CreateTicketsAsync(long eventId, int quantity, int priceCents = 0);
     Task<TicketDto> UpdateTicketStatusAsync(long id, string newStatus, string? reason = null);
     Task<TicketDto> ReleaseTicketAsync(long id, string? reason = null);
     Task<IEnumerable<TicketDto>> GetExpiredTicketsAsync();
@@ -49,7 +49,7 @@ public class TicketService : ITicketService
         return ticket == null ? null : MapToDto(ticket);
     }
 
-    public async Task<IEnumerable<TicketDto>> CreateTicketsAsync(long eventId, int quantity)
+    public async Task<IEnumerable<TicketDto>> CreateTicketsAsync(long eventId, int quantity, int priceCents = 0)
     {
         var tickets = new List<Ticket>();
 
@@ -58,7 +58,8 @@ public class TicketService : ITicketService
             var ticket = new Ticket
             {
                 EventId = eventId,
-                Status = TicketStatus.Available
+                Status = TicketStatus.Available,
+                PriceCents = priceCents
             };
 
             var created = await _ticketRepository.AddAsync(ticket);
@@ -150,6 +151,7 @@ public class TicketService : ITicketService
             PaidAt = ticket.PaidAt,
             OrderId = ticket.OrderId,
             ReservedBy = ticket.ReservedBy,
+            PriceCents = ticket.PriceCents,
             Version = ticket.Version
         };
     }

@@ -64,18 +64,31 @@ public class RabbitMQConsumer : BackgroundService
                 if (message is not null)
                 {
                     using var scope = _scopeFactory.CreateScope();
-                    // HUMAN CHECK:
-                    // El adapter de infraestructura debe invocar el caso de uso por su
-                    // puerto de entrada para evitar acoplamiento al handler concreto.
                     var useCase = scope.ServiceProvider.GetRequiredService<IProcessReservationUseCase>();
                     var publisher = scope.ServiceProvider.GetRequiredService<IStatusChangedPublisher>();
-                    await useCase.HandleAsync(message, stoppingToken);
+                    var result = await useCase.HandleAsync(message, stoppingToken);
 
-                    // HUMAN CHECK:
-                    // El evento status.changed debe publicarse solo después de procesar
-                    // la reserva para evitar notificar al cliente un estado que aún no fue
-                    // persistido. Mantener este orden reduce race conditions con SSE.
-                    await publisher.PublishAsync(message.TicketId, "reserved", stoppingToken);
+                    if (result.Success)
+                    {
+                        // Notificar cambio de estado a CrudService / SSE
+                        await publisher.PublishAsync(message.TicketId, "reserved", stoppingToken);
+
+                        // Encolar mensaje de expiración en la delay queue (TTL 5 min → dead-letter a ticket.expired)
+                        var expirationPayload = JsonSerializer.SerializeToUtf8Bytes(
+                            new { TicketId = message.TicketId });
+                        var props = new BasicProperties { Persistent = true, ContentType = "application/json" };
+                        await _channel!.BasicPublishAsync(
+                            exchange: string.Empty,
+                            routingKey: "q.ticket.reserved.delay",
+                            mandatory: false,
+                            basicProperties: props,
+                            body: expirationPayload,
+                            cancellationToken: stoppingToken);
+
+                        _logger.LogInformation(
+                            "Expiration scheduled for Ticket {TicketId} via delay queue",
+                            message.TicketId);
+                    }
                 }
 
                 await _channel.BasicAckAsync(eventArgs.DeliveryTag, multiple: false, stoppingToken);

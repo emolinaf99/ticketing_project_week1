@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using AuthService.Domain.Entities;
 
 namespace AuthService.Application.DTOs;
 
@@ -23,6 +24,9 @@ public sealed class RegisterUserRequest
     [Required(ErrorMessage = "La confirmación de contraseña es obligatoria.")]
     [Compare(nameof(Password), ErrorMessage = "Las contraseñas no coinciden.")]
     public string ConfirmPassword { get; init; } = default!;
+
+    [Required(ErrorMessage = "El rol es obligatorio.")]
+    public UserRole Role { get; init; } = UserRole.Buyer;
 }
 
 public sealed record RegisterUserResponse(string Message, string Redirect);

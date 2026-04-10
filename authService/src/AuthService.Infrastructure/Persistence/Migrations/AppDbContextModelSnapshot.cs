@@ -66,6 +66,12 @@ namespace AuthService.Infrastructure.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("password_hash");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasDefaultValue("buyer")
+                        .HasColumnName("role");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Email")

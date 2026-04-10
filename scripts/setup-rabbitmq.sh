@@ -58,10 +58,10 @@ curl -s -u "$RABBIT_USER:$RABBIT_PASS" -X PUT \
   -d '{"durable":true}' \
   "$RABBIT_URL/queues/$VHOST/q.ticket.expired" && echo " ✓" || echo " ✗"
 
-echo "[8/12] Creando queue delay: q.ticket.reserved.delay (TTL 5 min)"
+echo "[8/12] Creando queue delay: q.ticket.reserved.delay (TTL 1 min)"
 curl -s -u "$RABBIT_USER:$RABBIT_PASS" -X PUT \
   -H "content-type:application/json" \
-  -d '{"durable":true,"arguments":{"x-message-ttl":300000,"x-dead-letter-exchange":"tickets","x-dead-letter-routing-key":"ticket.expired"}}' \
+  -d '{"durable":true,"arguments":{"x-message-ttl":60000,"x-dead-letter-exchange":"tickets","x-dead-letter-routing-key":"ticket.expired"}}' \
   "$RABBIT_URL/queues/$VHOST/q.ticket.reserved.delay" && echo " ✓" || echo " ✗"
 
 # Bindings
@@ -95,11 +95,24 @@ curl -s -u "$RABBIT_USER:$RABBIT_PASS" -X POST \
   -d '{"routing_key":"ticket.status.changed"}' \
   "$RABBIT_URL/bindings/$VHOST/e/tickets/q/q.ticket.status.changed" && echo " ✓" || echo " ✗"
 
-echo "[14/14] Bindeando: q.ticket.expired ← ticket.expired"
+echo "[14/16] Bindeando: q.ticket.expired ← ticket.expired"
 curl -s -u "$RABBIT_USER:$RABBIT_PASS" -X POST \
   -H "content-type:application/json" \
   -d '{"routing_key":"ticket.expired"}' \
   "$RABBIT_URL/bindings/$VHOST/e/tickets/q/q.ticket.expired" && echo " ✓" || echo " ✗"
+
+# Fair Queue — cola dedicada para que FairQueueService detecte tickets liberados
+echo "[15/16] Creando queue: q.ticket.released.queue (Fair Queue listener)"
+curl -s -u "$RABBIT_USER:$RABBIT_PASS" -X PUT \
+  -H "content-type:application/json" \
+  -d '{"durable":true}' \
+  "$RABBIT_URL/queues/$VHOST/q.ticket.released.queue" && echo " ✓" || echo " ✗"
+
+echo "[16/16] Bindeando: q.ticket.released.queue ← ticket.status.changed"
+curl -s -u "$RABBIT_USER:$RABBIT_PASS" -X POST \
+  -H "content-type:application/json" \
+  -d '{"routing_key":"ticket.status.changed"}' \
+  "$RABBIT_URL/bindings/$VHOST/e/tickets/q/q.ticket.released.queue" && echo " ✓" || echo " ✗"
 
 echo ""
 echo "✓ Configuración completada!"

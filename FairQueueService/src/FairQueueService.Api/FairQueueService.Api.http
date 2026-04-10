@@ -1,0 +1,6 @@
+@FairQueueService.Api_HostAddress = http://localhost:5252
+
+GET {{FairQueueService.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
